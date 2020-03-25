@@ -19,3 +19,4 @@ testlist.txt
 NOTE:
 - since the weights.hdf5 exceeds the file size limit of GitHub, we cannot push it to the repo. 
 - thus, user must run the training code before runnning the testing code
+
