@@ -84,9 +84,11 @@ num_frames = 0
 for i in tqdm(range(test_videos.shape[0])):
     data_outfile = []
     data_outfile.append("heads up: detecting mopping floor activity")
-
     count = 0
     videoFile = test_videos[i]
+
+    print("\n\nVideo File: " + videoFile.split(' ')[0].split('/')[1])
+
     cap = cv2.VideoCapture(videoFile.split(' ')[0].split('/')[1])   # capturing the video from the given path
     frameRate = cap.get(5) #frame rate
     timestamps = []
@@ -171,6 +173,6 @@ for i in tqdm(range(test_videos.shape[0])):
     with open(videoFile.split(' ')[0].split('/')[1] + '.json', 'w') as outfile:
         json.dump(data_outfile, outfile)
 
-print("Correctly predicted:", num_total_correct)
 print("Total num frames: ", num_frames)
+print("Correctly predicted:", num_total_correct)
 print("Test Accuracy: ", float(num_total_correct)/num_frames*100)

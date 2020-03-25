@@ -1,0 +1,5 @@
+Billiards/v_Billiards_g01_c01.avi
+FloorGymnastics/v_FloorGymnastics_g01_c01.avi
+GolfSwing/v_GolfSwing_g01_c01.avi
+JavelinThrow/v_JavelinThrow_g01_c01.avi
+MoppingFloor/v_MoppingFloor_g01_c01.avi
