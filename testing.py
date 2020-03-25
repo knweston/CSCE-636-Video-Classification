@@ -83,6 +83,7 @@ num_frames = 0
 # for loop to extract frames from each test video
 for i in tqdm(range(test_videos.shape[0])):
     data_outfile = []
+    data_graph = []
     data_outfile.append("heads up: detecting mopping floor activity")
     count = 0
     videoFile = test_videos[i]
@@ -169,6 +170,10 @@ for i in tqdm(range(test_videos.shape[0])):
     # combine time/label data and write out to JSON file
     for i in range(len(timestamps)):
         data_outfile.append([str(timestamps[i]), str(predictions[i])])
+        data_graph.append([timestamps[i], predictions[i]])
+
+    plt.scatter(timestamps, predictions)
+    plt.show()
 
     with open(videoFile.split(' ')[0].split('/')[1] + '.json', 'w') as outfile:
         json.dump(data_outfile, outfile)
