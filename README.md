@@ -17,7 +17,7 @@ testlist.txt
 - user must put in the names of all testing videos in here before testing the model
 
 
-# Instructions on How to Test the Trained DNN
+# Instructions on How to Train and Test the DNN
 
 Install dependencies:
 - Python 2.7
