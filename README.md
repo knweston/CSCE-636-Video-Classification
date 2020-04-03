@@ -41,3 +41,7 @@ NOTE:
 - Thus, user can either run the training code to generate the weight file for testing or download it at this link (most updated version):
   https://drive.google.com/file/d/1J0eJH_90PYdXjSeLwyf1AiaBw_L-XPfU/view?usp=sharing
 - Put the weights.hdf5 file in the same folder as the testing.py file
+
+Instruction Videos:
+- Training: https://youtu.be/RKVa47go7N0
+- Testing: https://youtu.be/gmvvhNZbfjA
