@@ -59,7 +59,7 @@ model.compile(loss='binary_crossentropy',optimizer='Adam',metrics=['accuracy'])
 # ==================================================================================== #
 
 # read the test list
-f = open("unmet-activity.txt", "r")
+f = open("testlist.txt", "r")
 temp = f.read()
 videos = temp.split('\n')
 
