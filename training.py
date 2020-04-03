@@ -57,11 +57,16 @@ train['tag'] = train_video_tag
 
 # ==================================================================================== #
 
+# remove old frames in the extracted_frames folder
+files = glob('training_videos/extracted_frames/*')
+for f in files:
+    os.remove(f)
+
 # extract the frames from training videos
 for i in tqdm(range(train.shape[0])):
     count = 0
     videoFile = train['video_name'][i]
-    cap = cv2.VideoCapture(videoFile.split(' ')[0].split('/')[1])   # capturing the video from the given path
+    cap = cv2.VideoCapture('training_videos/' + videoFile.split(' ')[0].split('/')[1])   # capturing the video from the given path
     frameRate = cap.get(5) #frame rate
     x=1
     while(cap.isOpened()):
@@ -69,24 +74,24 @@ for i in tqdm(range(train.shape[0])):
         ret, frame = cap.read()
         if (ret != True):
             break
-        if (frameId % math.floor(frameRate) == 0):
-            # storing the frames in a new folder named training_frames
-            filename ='training_frames/' + videoFile.split('/')[1].split(' ')[0] +"_frame%d.jpg" % count;count+=1
+        if (frameId % math.floor(frameRate) == 0): # get one frame per second
+            # storing the frames in a new folder named extracted_frames
+            filename ='training_videos/extracted_frames/' + videoFile.split('/')[1].split(' ')[0] +"_frame%d.jpg" % count;count+=1
             cv2.imwrite(filename, frame)
     cap.release()
 
 # ==================================================================================== #
 
 # get label for all images
-images = glob("training_frames/*.jpg")
+images = glob("training_videos/extracted_frames/*.jpg")
 train_image = []
 train_class = []
 for i in tqdm(range(len(images))):
     # creating the image name
-    train_image.append(images[i].split('/')[1])
+    train_image.append(images[i].split('/')[2])
     # creating the class of image
-    if (images[i].split('/')[1].split('_')[1]) == "MoppingFloor":
-        train_class.append(images[i].split('/')[1].split('_')[1])
+    if (images[i].split('/')[2].split('_')[1]) == "MoppingFloor":
+        train_class.append(images[i].split('/')[2].split('_')[1])
     else:
         train_class.append("NotMopping")
     
@@ -110,7 +115,7 @@ train_image = []
 # load all video frames
 for i in tqdm(range(train.shape[0])):
     # load the image and keep the target size as (224,224,3)
-    img = image.load_img('training_frames/'+train['image'][i], target_size=(224,224,3))
+    img = image.load_img('training_videos/extracted_frames/'+train['image'][i], target_size=(224,224,3))
     # convert it into an array
     img = image.img_to_array(img)
     # normalize the pixel value
@@ -164,8 +169,8 @@ print(x_validate.shape)
 print "Reshaping training data for the final fully connected neural network ... ",
 
 # reshape the training as well as validation frames in single dimension
-x_train = x_train.reshape(1572, 7*7*512)
-x_validate = x_validate.reshape(394, 7*7*512)
+x_train = x_train.reshape(x_train.shape[0], 7*7*512)
+x_validate = x_validate.reshape(x_validate.shape[0], 7*7*512)
 
 # normalize the pixel values
 max = x_train.max()
@@ -177,7 +182,7 @@ print "x_train shape:    ",
 print(x_train.shape)
 print "x_validate shape: ", 
 print(x_validate.shape)
-print()
+print("")
 
 # # ==================================================================================== #
 
@@ -203,3 +208,8 @@ model.compile(loss='binary_crossentropy',optimizer='Adam',metrics=['accuracy'])
 
 # train the model
 model.fit(x_train, y_train, epochs=15, validation_data=(x_validate, y_validate), callbacks=[mcp_save], batch_size=128)
+
+# remove used frames in the extracted_frames folder
+files = glob('training_videos/extracted_frames/*')
+for f in files:
+    os.remove(f)
