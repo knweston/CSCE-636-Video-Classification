@@ -42,6 +42,6 @@ NOTE:
   https://drive.google.com/file/d/1J0eJH_90PYdXjSeLwyf1AiaBw_L-XPfU/view?usp=sharing
 - Put the weights.hdf5 file in the same folder as the testing.py file
 
-Instruction Videos:
+Instruction Videos on how to use this code:
 - Training: https://youtu.be/RKVa47go7N0
 - Testing: https://youtu.be/gmvvhNZbfjA
