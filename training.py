@@ -34,6 +34,16 @@ from tqdm import tqdm
 from scipy import stats as s
 
 # ==================================================================================== #
+def create_model(config):
+    model = Sequential()
+    model.add(Dense(config[0], activation='relu', input_shape=(25088,)))
+    for i in range(1, len(config)):
+        model.add(Dropout(0.5))
+        model.add(Dense(config[i], activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(2, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy',optimizer='Adam',metrics=['accuracy'])
+    return model
 
 # open the file containing the list of training videos
 f = open("trainlist.txt", "r")
@@ -68,7 +78,6 @@ for i in tqdm(range(train.shape[0])):
     videoFile = train['video_name'][i]
     cap = cv2.VideoCapture('training_videos/' + videoFile.split(' ')[0].split('/')[1])   # capturing the video from the given path
     frameRate = cap.get(5) #frame rate
-    x=1
     while(cap.isOpened()):
         frameId = cap.get(1) #current frame number
         ret, frame = cap.read()
@@ -89,11 +98,12 @@ train_class = []
 for i in tqdm(range(len(images))):
     # creating the image name
     train_image.append(images[i].split('/')[2])
+    
     # creating the class of image
-    if (images[i].split('/')[2].split('_')[1]) == "MoppingFloor":
-        train_class.append(images[i].split('/')[2].split('_')[1])
+    if images[i].split('/')[2].split('_')[1] == "MoppingFloor" or images[i].split('/')[2].split('_')[1] == "WashingDishes":
+        train_class.append("housework")
     else:
-        train_class.append("NotMopping")
+        train_class.append("not_housework")
     
 # storing the images and their class in a dataframe
 train_data = pd.DataFrame()
@@ -184,21 +194,25 @@ print "x_validate shape: ",
 print(x_validate.shape)
 print("")
 
-# # ==================================================================================== #
+# ==================================================================================== #
 
 # create the model
 model = Sequential()
-model.add(Dense(512, activation='relu', input_shape=(25088,)))
-model.add(Dropout(0.5))
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(256, activation='relu'))
+model.add(Dense(128, activation='relu', input_shape=(25088,)))
 model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(16, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(8, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(4, activation='relu'))
+model.add(Dropout(0.5))
 model.add(Dense(2, activation='sigmoid'))
 
-# # ==================================================================================== #
+# ==================================================================================== #
 
 # create a checkpoint file to store the trained weights 
 mcp_save = ModelCheckpoint('weights.hdf5', save_best_only=True, monitor='val_loss', mode='min')

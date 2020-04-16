@@ -41,14 +41,19 @@ import json
 base_model = VGG16(weights='imagenet', include_top=False)
 
 # create the model (identical to the one used in training)
+# tested from 3-6 layers, 32-1024 neurons/layer
 model = Sequential()
-model.add(Dense(512, activation='relu', input_shape=(25088,)))
-model.add(Dropout(0.5))
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(256, activation='relu'))
+model.add(Dense(128, activation='relu', input_shape=(25088,)))
 model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(16, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(8, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(4, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(2, activation='sigmoid'))
 
@@ -119,12 +124,12 @@ for i in tqdm(range(test_videos.shape[0])):
         test_image.append(images[i].split('/')[2])
         images_list.append(images[i].split('/')[2])
         # creating the class of image
-        if (images[i].split('/')[2].split('_')[1]) == "MoppingFloor":
-            test_class.append(images[i].split('/')[2].split('_')[1])
-            classes_list.append(images[i].split('/')[2].split('_')[1])
+        if images[i].split('/')[2].split('_')[1] == "MoppingFloor" or images[i].split('/')[2].split('_')[1] == "WashingDishes":
+            test_class.append("housework")
+            classes_list.append("housework")
         else:
-            test_class.append("NotMopping")
-            classes_list.append("NotMopping")
+            test_class.append("not_housework")
+            classes_list.append("not_housework")
 
     # store the images and their class in a dataframe
     test_data = pd.DataFrame()
@@ -160,21 +165,19 @@ for i in tqdm(range(test_videos.shape[0])):
         x_test = x_test.reshape(x_test.shape[0], 7*7*512)
 
         # make prediction using our trained model
-        prediction = model.predict_classes(x_test)      # 0 == mopping, 1 == not mopping
-        probability = model.predict_proba(x_test)       # [1,0] == mopping, [0,1] == not mopping
-        predictions.append(probability[0][0])           # probability[0][0] == probability of mopping
-        if prediction == 0 and actual[i] == "MoppingFloor":
+        prediction = model.predict_classes(x_test)      # 0 == housework, 1 == not doing housework
+        probability = model.predict_proba(x_test)       # [1,0] == housework, [0,1] == not doing housework
+        predictions.append(probability[0][0])           # probability[0][0] == probability of housework
+        if prediction == 0 and actual[i] == "housework":
             num_total_correct += 1
             correctness_list.append('yes')
-        elif prediction == 1 and actual[i] == "NotMopping":
+        elif prediction == 1 and actual[i] == "not_housework":
             num_total_correct += 1
             correctness_list.append('yes')
         else:
             correctness_list.append('no')
         num_frames += 1
         predictions_list.append(prediction)
-
-    
 
     # combine time/label data and write out to JSON file
     for i in range(len(timestamps)):
