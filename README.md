@@ -27,7 +27,11 @@ Install dependencies:
 - Scipy, sklearn, skimage, glob, tqdm
 
 How to train:
-- Put the name of the training videos in the trainlist.txt file
+- Put the name of the training videos in the trainlist.txt file in this format: 
+  [name_of_video]/v_[name_of_video]. For example:
+  - Name of video is: DoingHousework.mp4
+  - Name put in the trainlist.txt: DoingHousework/v_DoingHousework.mp4 
+
 - Put the training video files in the training_videos folder
 - Start the training process using command: python training.py
 
