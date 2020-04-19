@@ -41,9 +41,9 @@ How to test:
 - Run the test using command: python testing.py
 
 NOTE:
-- Since the weights.hdf5 exceeds the file size limit of GitHub, we cannot push it to the repo. 
-- Thus, user can either run the training code to generate the weight file for testing or download it at this link (most updated version):
-  https://drive.google.com/file/d/1J0eJH_90PYdXjSeLwyf1AiaBw_L-XPfU/view?usp=sharing
+- weights file of submission 6 is in this github repo. 
+- Old weight files for testing can be downloaded it at this link:
+  https://drive.google.com/open?id=19J8olymAioX9sbiVs7yulqMCNvNc3Xvh
 - Put the weights.hdf5 file in the same folder as the testing.py file
 
 Instruction Videos on how to use this code:
