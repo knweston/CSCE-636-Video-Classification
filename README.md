@@ -16,6 +16,15 @@ testlist.txt
 - list of testing videos
 - user must put in the names of all testing videos in here before testing the model
 
+Test Videos:
+- there are 5 testing videos already inside the testing_videos folder
+- other 5 videos on YouTube:
+  https://youtu.be/mwPCg87oioQ
+  https://youtu.be/cCALID3jtZY
+  https://youtu.be/SYdYS5372ag
+  https://youtu.be/VgoHuu2Zl1M
+  https://youtu.be/-CIRVqJtBrE
+  
 
 # Instructions on How to Train and Test the DNN
 
