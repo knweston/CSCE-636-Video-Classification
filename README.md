@@ -19,11 +19,11 @@ testlist.txt
 Test Videos:
 - there are 5 testing videos already inside the testing_videos folder
 - other 5 videos on YouTube:
-  https://youtu.be/mwPCg87oioQ
-  https://youtu.be/cCALID3jtZY
-  https://youtu.be/SYdYS5372ag
-  https://youtu.be/VgoHuu2Zl1M
-  https://youtu.be/-CIRVqJtBrE
+  - https://youtu.be/mwPCg87oioQ
+  - https://youtu.be/cCALID3jtZY
+  - https://youtu.be/SYdYS5372ag
+  - https://youtu.be/VgoHuu2Zl1M
+  - https://youtu.be/-CIRVqJtBrE
   
 
 # Instructions on How to Train and Test the DNN
