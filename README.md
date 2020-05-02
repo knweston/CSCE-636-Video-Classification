@@ -16,6 +16,15 @@ testlist.txt
 - list of testing videos
 - user must put in the names of all testing videos in here before testing the model
 
+Test Videos:
+- there are 5 testing videos already inside the testing_videos folder
+- other 5 videos on YouTube:
+  - https://youtu.be/mwPCg87oioQ
+  - https://youtu.be/cCALID3jtZY
+  - https://youtu.be/SYdYS5372ag
+  - https://youtu.be/VgoHuu2Zl1M
+  - https://youtu.be/-CIRVqJtBrE
+  
 
 # Instructions on How to Train and Test the DNN
 
@@ -27,21 +36,18 @@ Install dependencies:
 - Scipy, sklearn, skimage, glob, tqdm
 
 How to train:
-- Put the name of the training videos in the trainlist.txt file in this format: 
-  [name_of_video]/v_[name_of_video]. For example:
-  - Name of video is: DoingHousework.mp4
-  - Name put in the trainlist.txt: DoingHousework/v_DoingHousework.mp4 
-
+- Put the full name of the training videos in the trainlist.txt file
 - Put the training video files in the training_videos folder
 - Start the training process using command: python training.py
 
 How to test:
-- Put the name of the testing videos in the testlist.txt file
+- Put the full name of the testing videos in the testlist.txt file 
 - Put the testing video files in the testing_videos folder
 - Run the test using command: python testing.py
 
 NOTE:
-- weights file of submission 6 is in this github repo. 
+- Link of the weights.hdf5 file of submission 8 is here:
+  https://drive.google.com/file/d/1xIl63cJKruDWNKPd3jSYznw_L4Ly27Md/view?usp=sharing
 - Old weight files for testing can be downloaded it at this link:
   https://drive.google.com/open?id=19J8olymAioX9sbiVs7yulqMCNvNc3Xvh
 - Put the weights.hdf5 file in the same folder as the testing.py file
