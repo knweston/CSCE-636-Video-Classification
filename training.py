@@ -34,16 +34,6 @@ from tqdm import tqdm
 from scipy import stats as s
 
 # ==================================================================================== #
-def create_model(config):
-    model = Sequential()
-    model.add(Dense(config[0], activation='relu', input_shape=(25088,)))
-    for i in range(1, len(config)):
-        model.add(Dropout(0.5))
-        model.add(Dense(config[i], activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(2, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy',optimizer='Adam',metrics=['accuracy'])
-    return model
 
 # open the file containing the list of training videos
 f = open("trainlist.txt", "r")
@@ -58,17 +48,8 @@ train.head()
 
 # ==================================================================================== #
 
-# create tags for training videos
-train_video_tag = []
-for i in range(train.shape[0]):
-    train_video_tag.append(train['video_name'][i].split('/')[0])
-    
-train['tag'] = train_video_tag
-
-# ==================================================================================== #
-
 # remove old frames in the extracted_frames folder
-files = glob('training_videos/extracted_frames/*')
+files = glob('training_videos/*.jpg')
 for f in files:
     os.remove(f)
 
@@ -76,7 +57,7 @@ for f in files:
 for i in tqdm(range(train.shape[0])):
     count = 0
     videoFile = train['video_name'][i]
-    cap = cv2.VideoCapture('training_videos/' + videoFile.split(' ')[0].split('/')[1])   # capturing the video from the given path
+    cap = cv2.VideoCapture('training_videos/' + videoFile)   # capturing the video from the given path
     frameRate = cap.get(5) #frame rate
     while(cap.isOpened()):
         frameId = cap.get(1) #current frame number
@@ -85,23 +66,25 @@ for i in tqdm(range(train.shape[0])):
             break
         if (frameId % math.floor(frameRate) == 0): # get one frame per second
             # storing the frames in a new folder named extracted_frames
-            filename ='training_videos/extracted_frames/' + videoFile.split('/')[1].split(' ')[0] +"_frame%d.jpg" % count;count+=1
+            filename ='training_videos/' + videoFile+"_frame%d.jpg" % count;count+=1
             cv2.imwrite(filename, frame)
     cap.release()
 
 # ==================================================================================== #
 
 # get label for all images
-images = glob("training_videos/extracted_frames/*.jpg")
+images = glob("training_videos/*.jpg")
 train_image = []
 train_class = []
 for i in tqdm(range(len(images))):
     # creating the image name
-    train_image.append(images[i].split('/')[2])
+    train_image.append(images[i].split('/')[1])
     
     # creating the class of image
-    if images[i].split('/')[2].split('_')[1] == "MoppingFloor" or images[i].split('/')[2].split('_')[1] == "WashingDishes":
-        train_class.append("housework")
+    if images[i].find('MoppingFloor') != -1:
+        train_class.append("housecleaning")
+    elif images[i].find('WashingDishes') != -1:
+        train_class.append("washingdishes")
     else:
         train_class.append("not_housework")
     
@@ -125,7 +108,7 @@ train_image = []
 # load all video frames
 for i in tqdm(range(train.shape[0])):
     # load the image and keep the target size as (224,224,3)
-    img = image.load_img('training_videos/extracted_frames/'+train['image'][i], target_size=(224,224,3))
+    img = image.load_img('training_videos/'+train['image'][i], target_size=(224,224,3))
     # convert it into an array
     img = image.img_to_array(img)
     # normalize the pixel value
@@ -198,19 +181,19 @@ print("")
 
 # create the model
 model = Sequential()
-model.add(Dense(128, activation='relu', input_shape=(25088,)))
+
+model.add(Dense(1024, activation='relu', input_shape=(25088,)))
+model.add(Dropout(0.5))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(256, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(16, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(8, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(4, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(2, activation='sigmoid'))
+
+model.add(Dense(3, activation='softmax'))
 
 # ==================================================================================== #
 
@@ -218,12 +201,12 @@ model.add(Dense(2, activation='sigmoid'))
 mcp_save = ModelCheckpoint('weights.hdf5', save_best_only=True, monitor='val_loss', mode='min')
 
 # compile the model
-model.compile(loss='binary_crossentropy',optimizer='Adam',metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy',optimizer='Adam',metrics=['accuracy'])
 
 # train the model
-model.fit(x_train, y_train, epochs=15, validation_data=(x_validate, y_validate), callbacks=[mcp_save], batch_size=128)
+model.fit(x_train, y_train, epochs=25, validation_data=(x_validate, y_validate), callbacks=[mcp_save], batch_size=128)
 
 # remove used frames in the extracted_frames folder
-files = glob('training_videos/extracted_frames/*')
+files = glob('training_videos/*.jpg')
 for f in files:
     os.remove(f)

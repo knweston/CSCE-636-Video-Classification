@@ -43,28 +43,28 @@ base_model = VGG16(weights='imagenet', include_top=False)
 # create the model (identical to the one used in training)
 # tested from 3-6 layers, 32-1024 neurons/layer
 model = Sequential()
-model.add(Dense(128, activation='relu', input_shape=(25088,)))
+
+model.add(Dense(1024, activation='relu', input_shape=(25088,)))
+model.add(Dropout(0.5))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(256, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(16, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(8, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(4, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(2, activation='sigmoid'))
+
+model.add(Dense(3, activation='softmax'))
 
 # load and compile the trained weights
 model.load_weights("weights.hdf5")
-model.compile(loss='binary_crossentropy',optimizer='Adam',metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy',optimizer='Adam',metrics=['accuracy'])
 
 # ==================================================================================== #
 
 # read the test list
-f = open("testlist.txt", "r")
+f = open("unmet_testing_videos/testlist.txt", "r")
 temp = f.read()
 videos = temp.split('\n')
 
@@ -85,6 +85,7 @@ images_list = []
 classes_list = []
 predictions_list = []
 correctness_list = []
+probability_list = []
 
 # for loop to extract frames from each test video
 for i in tqdm(range(test_videos.shape[0])):
@@ -93,13 +94,13 @@ for i in tqdm(range(test_videos.shape[0])):
     count = 0
     videoFile = test_videos[i]
 
-    print("\n\nVideo File: " + videoFile.split(' ')[0].split('/')[1])
+    print("\n\nVideo File: " + videoFile)
 
-    cap = cv2.VideoCapture('testing_videos/' + videoFile.split(' ')[0].split('/')[1])   # capturing the video from the given path
+    cap = cv2.VideoCapture('unmet_testing_videos/' + videoFile)   # capturing the video from the given path
     frameRate = cap.get(5) #frame rate
     timestamps = []
     # removing all other files from the extracted_frames folder
-    files = glob('testing_videos/extracted_frames/*')
+    files = glob('unmet_testing_videos/*.jpg')
     for f in files:
         os.remove(f)
     while(cap.isOpened()):
@@ -110,26 +111,32 @@ for i in tqdm(range(test_videos.shape[0])):
         if (frameId % math.floor(frameRate) == 0):
             timestamps.append(cap.get(cv2.CAP_PROP_POS_MSEC)/1000)
             # storing the frames of this particular video in extracted_frames folder
-            filename ='testing_videos/extracted_frames/' + videoFile.split('/')[1].split(' ')[0] + "_frame%d.jpg" % count;count+=1
+            filename ='unmet_testing_videos/' + videoFile+ "_frame%d.jpg" % count;count+=1
             cv2.imwrite(filename, frame)
     cap.release()
 
     # reading all the frames from extracted_frames folder
-    images = glob("testing_videos/extracted_frames/*.jpg")
+    images = glob("unmet_testing_videos/*.jpg")
 
     test_image = []
     test_class = []
     for i in tqdm(range(len(images))):
         # creating the image name
-        test_image.append(images[i].split('/')[2])
-        images_list.append(images[i].split('/')[2])
+        test_image.append(images[i].split('/')[1])
+        images_list.append(images[i].split('/')[1])
         # creating the class of image
-        if images[i].split('/')[2].split('_')[1] == "MoppingFloor" or images[i].split('/')[2].split('_')[1] == "WashingDishes":
-            test_class.append("housework")
-            classes_list.append("housework")
+        if images[i].find('MoppingFloor') != -1:
+            test_class.append("housecleaning")
+            classes_list.append("housecleaning")
+
+        elif images[i].find('WashingDishes') != -1:
+            test_class.append("washingdishes")
+            classes_list.append("washingdishes")
+        
         else:
             test_class.append("not_housework")
             classes_list.append("not_housework")
+
 
     # store the images and their class in a dataframe
     test_data = pd.DataFrame()
@@ -151,7 +158,7 @@ for i in tqdm(range(test_videos.shape[0])):
     # extract video frames and make prediction
     for i in tqdm(range(test.shape[0])):
         # loading the image and keeping the target size as (224,224,3)
-        img = image.load_img('testing_videos/extracted_frames/'+test['image'][i], target_size=(224,224,3))
+        img = image.load_img('unmet_testing_videos/'+test['image'][i], target_size=(224,224,3))
         # converting it to array
         img = image.img_to_array(img)
         # normalizing the pixel value
@@ -165,35 +172,41 @@ for i in tqdm(range(test_videos.shape[0])):
         x_test = x_test.reshape(x_test.shape[0], 7*7*512)
 
         # make prediction using our trained model
-        prediction = model.predict_classes(x_test)      # 0 == housework, 1 == not doing housework
-        probability = model.predict_proba(x_test)       # [1,0] == housework, [0,1] == not doing housework
-        predictions.append(probability[0][0])           # probability[0][0] == probability of housework
-        if prediction == 0 and actual[i] == "housework":
+        prediction = model.predict_classes(x_test)      # 0 == housecleaning, 1 == not_housework, 2 == washingdishes
+        probability = model.predict_proba(x_test)       # [1,0,0] == housecleaning, [0,1,0] == not_housework, [0,0,1] == washingdishes
+        predictions.append(1.0 - probability[0][1])     # probability[0][1] == probability of not_housework
+        if prediction == 0 and actual[i] == "housecleaning":
             num_total_correct += 1
             correctness_list.append('yes')
         elif prediction == 1 and actual[i] == "not_housework":
+            num_total_correct += 1
+            correctness_list.append('yes')
+        elif prediction == 2 and actual[i] == "washingdishes":
             num_total_correct += 1
             correctness_list.append('yes')
         else:
             correctness_list.append('no')
         num_frames += 1
         predictions_list.append(prediction)
+        probability_list.append(1.0 - probability[0][1])
 
     # combine time/label data and write out to JSON file
     for i in range(len(timestamps)):
         data_outfile.append([str(timestamps[i]), str(predictions[i])])
+    plt.ylim(-0.25,1.25)
+    plt.plot(timestamps, predictions)
+    plt.savefig(videoFile + '.png')
+    plt.close()
 
-    plt.scatter(timestamps, predictions)
-    plt.savefig(videoFile.split(' ')[0].split('/')[1] + '.png')
-
-    with open(videoFile.split(' ')[0].split('/')[1] + '.json', 'w') as outfile:
+    with open(videoFile + '.json', 'w') as outfile:
         json.dump(data_outfile, outfile)
 
 result = pd.DataFrame()
-result['image']      = images_list
-result['class']      = classes_list
-result['prediction'] = predictions_list
-result['correct']    = correctness_list
+result['image']       = images_list
+result['class']       = classes_list
+result['prediction']  = predictions_list
+result['probability'] = probability_list
+result['correct']     = correctness_list
 
 result.to_csv('testing_results.csv',header=True, index=False)
 
@@ -202,6 +215,6 @@ print("Correctly predicted:", num_total_correct)
 print("Test Accuracy: ", float(num_total_correct)/num_frames*100)
 
 # clean up all images from the extracted_frames folder
-files = glob('testing_videos/extracted_frames/*')
+files = glob('unmet_testing_videos/*.jpg')
 for f in files:
     os.remove(f)
