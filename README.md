@@ -47,11 +47,11 @@ How to test:
 - Run the test using command: python testing.py
 
 NOTE:
+- The current code is ready to run. There are already 6 testing videos in the testing_videos folder and their names are also put in the testlist.txt
 - Link of the weights.hdf5 file of submission 8 is here:
   https://drive.google.com/file/d/1xIl63cJKruDWNKPd3jSYznw_L4Ly27Md/view?usp=sharing
 - Old weight files for testing can be downloaded it at this link:
   https://drive.google.com/open?id=19J8olymAioX9sbiVs7yulqMCNvNc3Xvh
-- Put the weights.hdf5 file in the same folder as the testing.py file
 
 Instruction Videos on how to use this code:
 - Training: https://youtu.be/RKVa47go7N0
