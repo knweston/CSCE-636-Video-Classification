@@ -43,6 +43,7 @@ How to train:
 How to test:
 - Put the full name of the testing videos in the testlist.txt file 
 - Put the testing video files in the testing_videos folder
+- Download and put the weights.hdf5 file in the same folder as test.py file
 - Run the test using command: python testing.py
 
 NOTE:
