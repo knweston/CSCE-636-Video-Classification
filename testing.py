@@ -81,13 +81,13 @@ model.add(Dense(3, activation='softmax'))
 # model.add(Dense(2, activation='sigmoid'))
 
 # load and compile the trained weights
-model.load_weights("weights-sub8.hdf5")
+model.load_weights("weights.hdf5")
 model.compile(loss='categorical_crossentropy',optimizer='Adam',metrics=['accuracy'])
 
 # ==================================================================================== #
 
 # read the test list
-f = open("given-videos/testlist.txt", "r")
+f = open("testlist.txt", "r")
 temp = f.read()
 videos = temp.split('\n')
 
@@ -119,11 +119,11 @@ for i in tqdm(range(test_videos.shape[0])):
 
     print("\n\nVideo File: " + videoFile)
 
-    cap = cv2.VideoCapture('given-videos/' + videoFile)   # capturing the video from the given path
+    cap = cv2.VideoCapture('testing_videos/' + videoFile)   # capturing the video from the given path
     frameRate = cap.get(5) #frame rate
     timestamps = []
     # removing all other files from the extracted_frames folder
-    files = glob('given-videos/*.jpg')
+    files = glob('testing_videos/*.jpg')
     for f in files:
         os.remove(f)
     while(cap.isOpened()):
@@ -134,12 +134,12 @@ for i in tqdm(range(test_videos.shape[0])):
         if (frameId % math.floor(frameRate) == 0):
             timestamps.append(cap.get(cv2.CAP_PROP_POS_MSEC)/1000)
             # storing the frames of this particular video in extracted_frames folder
-            filename ='given-videos/' + videoFile+ "_frame%03d.jpg" % count;count+=1
+            filename ='testing_videos/' + videoFile+ "_frame%03d.jpg" % count;count+=1
             cv2.imwrite(filename, frame)
     cap.release()
 
     # reading all the frames from extracted_frames folder
-    images = sorted(glob("given-videos/*.jpg"))
+    images = sorted(glob("testing_videos/*.jpg"))
 
     test_image = []
     test_class = []
@@ -187,7 +187,7 @@ for i in tqdm(range(test_videos.shape[0])):
     # extract video frames and make prediction
     for i in tqdm(range(test.shape[0])):
         # loading the image and keeping the target size as (224,224,3)
-        img = image.load_img('given-videos/'+test['image'][i], target_size=(224,224,3))
+        img = image.load_img('testing_videos/'+test['image'][i], target_size=(224,224,3))
         # converting it to array
         img = image.img_to_array(img)
         # normalizing the pixel value
@@ -254,6 +254,6 @@ print("Correctly predicted:", num_total_correct)
 print("Test Accuracy: ", float(num_total_correct)/num_frames*100)
 
 # clean up all images from the extracted_frames folder
-# files = glob('given-videos/*.jpg')
+# files = glob('testing_videos/*.jpg')
 # for f in files:
 #     os.remove(f)
