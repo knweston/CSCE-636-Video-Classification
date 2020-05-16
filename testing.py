@@ -56,30 +56,6 @@ model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(3, activation='softmax'))
 
-# model.add(Dense(128, activation='relu', input_shape=(25088,)))
-# model.add(Dropout(0.5))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(64, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(16, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(8, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(4, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(2, activation='sigmoid'))
-
-# model.add(Dense(512, activation='relu', input_shape=(25088,)))
-# model.add(Dropout(0.5))
-# model.add(Dense(256, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(256, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(2, activation='sigmoid'))
-
 # load and compile the trained weights
 model.load_weights("weights.hdf5")
 model.compile(loss='categorical_crossentropy',optimizer='Adam',metrics=['accuracy'])
@@ -159,13 +135,6 @@ for i in tqdm(range(test_videos.shape[0])):
         else:
             test_class.append("not_housework")
             classes_list.append("not_housework")
-        
-        # if images[i].find('MoppingFloor') != -1 or images[i].find('WashingDishes') != -1:
-        #     test_class.append("housework")
-        #     classes_list.append("housework")
-        # else:
-        #     test_class.append("not_housework")
-        #     classes_list.append("not_housework")
 
     # store the images and their class in a dataframe
     test_data = pd.DataFrame()
@@ -215,15 +184,6 @@ for i in tqdm(range(test_videos.shape[0])):
             correctness_list.append('yes')
         else:
             correctness_list.append('no')
-
-        # if prediction == 0 and actual[i] == "housework":
-        #     num_total_correct += 1
-        #     correctness_list.append('yes')
-        # elif prediction == 1 and actual[i] == "not_housework":
-        #     num_total_correct += 1
-        #     correctness_list.append('yes')
-        # else:
-        #     correctness_list.append('no')
 
         num_frames += 1
         predictions_list.append(prediction)
